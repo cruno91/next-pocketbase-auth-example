@@ -3,6 +3,22 @@ env_file:
   - .lando.env
   - .lando.local.env
 services:
+  next:
+    type: node:20
+    port: 3000
+    ssl: true
+    sslExpose: true
+    scanner:
+      okCodes:
+        - 404
+        - 502
+        - ECONNRESET
+    build_as_root:
+      - apt-get update -y && apt-get install -y --no-install-recommends apt-utils
+      - apt-get update -y && apt-get install -y apt-transport-https build-essential unzip
+    build:
+      - mkdir -p /var/www/.npm-global/lib
+      - cd /app/frontend && npm install
   pocketbase:
     type: go
     port: 8090
@@ -25,11 +41,39 @@ services:
       - rm pocketbase_0.22.21_linux_amd64.zip
       - cd /app/pocketbase && ./pocketbase migrate up
       - cd /app/pocketbase && ./pocketbase admin create admin@example.com In5ecureP4S123
+  api:
+    type: go
+    port: 8090
+    scanner:
+      okCodes:
+        - 400
+        - 401
+        - 403
+        - 404
+        - 500
+        - 502
+        - 503
+        - 504
+        - ECONNRESET
+    build_as_root:
+      - apt-get update -y && apt-get install -y --no-install-recommends apt-utils unzip
 proxy:
+  next:
+    - authexample.lndo.site:3000
   pocketbase:
-    - api.authexample.lndo.site:8090
+    - db.authexample.lndo.site:8090
+  api:
+    - api.authexample.lndo.site
 tooling:
   pb:
     service: pocketbase
+    cmd: ./pocketbase
+    dir: /app/pocketbase
+  db:
+    service: pocketbase
     cmd: ./pocketbase serve --http=0.0.0.0:8090
     dir: /app/pocketbase
+  npm:
+    service: next
+    cmd: npm
+    dir: /app/frontend
