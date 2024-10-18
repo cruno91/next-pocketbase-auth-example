@@ -1,0 +1,35 @@
+name: authexample
+env_file:
+  - .lando.env
+  - .lando.local.env
+services:
+  pocketbase:
+    type: go
+    port: 8090
+    scanner:
+      okCodes:
+        - 400
+        - 401
+        - 403
+        - 404
+        - 500
+        - 502
+        - 503
+        - 504
+        - ECONNRESET
+    build_as_root:
+      - apt-get update -y && apt-get install -y --no-install-recommends apt-utils unzip
+      - wget https://github.com/pocketbase/pocketbase/releases/download/v0.22.21/pocketbase_0.22.21_linux_amd64.zip
+      - rm -rf pocketbase/pb_data pocketbase/pocketbase pocketbase/CHANGELOG.md pocketbase/LICENSE.md
+      - unzip pocketbase_0.22.21_linux_amd64.zip -d pocketbase
+      - rm pocketbase_0.22.21_linux_amd64.zip
+#      - cd /app/pocketbase && ./pocketbase migrate up
+#      - cd /app/pocketbase && ./pocketbase admin create admin@example.com In5ecureP4S123
+proxy:
+  pocketbase:
+    - api.authexample.lndo.site:8090
+tooling:
+  pb:
+    service: pocketbase
+    cmd: ./pocketbase serve --http=0.0.0.0:8090
+    dir: /app/pocketbase
