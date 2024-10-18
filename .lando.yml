@@ -23,8 +23,8 @@ services:
       - rm -rf pocketbase/pb_data pocketbase/pocketbase pocketbase/CHANGELOG.md pocketbase/LICENSE.md
       - unzip pocketbase_0.22.21_linux_amd64.zip -d pocketbase
       - rm pocketbase_0.22.21_linux_amd64.zip
-#      - cd /app/pocketbase && ./pocketbase migrate up
-#      - cd /app/pocketbase && ./pocketbase admin create admin@example.com In5ecureP4S123
+      - cd /app/pocketbase && ./pocketbase migrate up
+      - cd /app/pocketbase && ./pocketbase admin create admin@example.com In5ecureP4S123
 proxy:
   pocketbase:
     - api.authexample.lndo.site:8090
