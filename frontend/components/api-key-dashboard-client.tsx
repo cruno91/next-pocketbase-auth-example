@@ -88,8 +88,6 @@ export default function ApiKeyDashboardClient({ initialApiKeys, user, token }: A
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-5">API Key Management</h1>
-
       <div className="mb-5">
         <h2 className="text-lg font-semibold mb-2">Create New API Key</h2>
         <div className="flex gap-2">
