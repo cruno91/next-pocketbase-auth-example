@@ -9,7 +9,8 @@
 ### Local environment
 
 1. Run `lando start`
-2. Go to https://authexample.lndo.site
+2. Run `lando npm run dev`
+3. Go to https://authexample.lndo.site
 
 ## Pocketbase
 
