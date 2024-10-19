@@ -50,3 +50,26 @@ export async function logout() {
 	cookies().delete('pb_auth');
 	redirect('/');
 }
+
+export async function register(email: string, password: string) {
+	const pb = new PocketBase(process.env.POCKETBASE_URL);
+
+	try {
+		// Create a new user
+		const user = await pb.collection('users').create({
+			email,
+			password,
+			passwordConfirm: password,
+		});
+
+		return { success: true, user };
+	} catch (error) {
+		console.error('Registration failed:', error);
+
+		if (error instanceof Error && error.message) {
+			return { success: false, error: error.message };
+		} else {
+			return { success: false, error: 'An unexpected error occurred. Please try again.' };
+		}
+	}
+}

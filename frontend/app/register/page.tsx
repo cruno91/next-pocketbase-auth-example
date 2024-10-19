@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from "next/link"
+import Link from 'next/link';
+import { register } from '../actions';
 
 export default function Register() {
 	const [email, setEmail] = useState('');
@@ -20,24 +21,12 @@ export default function Register() {
 			return;
 		}
 
-		try {
-			const res = await fetch('/api/register', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ email, password, passwordConfirm: confirmPassword }),
-			});
+		const result = await register(email, password);
 
-			const data = await res.json();
-
-			if (res.ok) {
-				router.push('/login');
-			} else {
-				setErrorMessage(data.error || 'Registration failed.');
-			}
-		} catch (error) {
-			setErrorMessage('An unexpected error occurred. Please try again.');
+		if (result.success) {
+			router.push('/login');
+		} else {
+			setErrorMessage(result.error || 'Registration failed.');
 		}
 	};
 
