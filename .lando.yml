@@ -76,3 +76,7 @@ tooling:
     service: next
     cmd: npm
     dir: /app/frontend
+  npx:
+    service: next
+    cmd: npx
+    dir: /app/frontend
