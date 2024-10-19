@@ -57,6 +57,9 @@ services:
         - ECONNRESET
     build_as_root:
       - apt-get update -y && apt-get install -y --no-install-recommends apt-utils unzip
+events:
+  post-start:
+    - pocketbase: cd /app/pocketbase && ./pocketbase serve --http=0.0.0.0:8090 &
 proxy:
   next:
     - authexample.lndo.site:3000
@@ -68,10 +71,6 @@ tooling:
   pb:
     service: pocketbase
     cmd: ./pocketbase
-    dir: /app/pocketbase
-  db:
-    service: pocketbase
-    cmd: ./pocketbase serve --http=0.0.0.0:8090
     dir: /app/pocketbase
   npm:
     service: next
