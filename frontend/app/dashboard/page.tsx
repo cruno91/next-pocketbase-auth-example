@@ -1,23 +1,46 @@
 import { cookies } from 'next/headers';
 import { logout } from '../actions';
+import ApiKeyDashboardClient from '@/components/api-key-dashboard-client';
 
-export default function Page() {
-	const cookie = cookies().get('pb_auth');
+async function getApiKeys(token: string) {
+	// Replace with your actual API endpoint
+	const response = await fetch('https://your-api-endpoint.com/api/api-keys', {
+		headers: {
+			'Authorization': `Bearer ${token}`,
+		},
+		cache: 'no-store',
+	});
 
-	// This never happens because of the middleware,
-	// but we must make typescript happy
-	if (!cookie) throw new Error('Not logged in');
+	if (!response.ok) {
+		throw new Error('Failed to fetch API keys');
+	}
 
-	const { model } = JSON.parse(cookie.value);
+	return response.json();
+}
+
+export default async function ApiKeyDashboard() {
+	const cookieStore = cookies();
+	const authCookie = cookieStore.get('pb_auth');
+
+	if (!authCookie) {
+		return <div>Not authenticated</div>;
+	}
+
+	const { token, model } = JSON.parse(authCookie.value);
+	let apiKeys = [];
+
+	try {
+		apiKeys = await getApiKeys(token);
+	} catch (error) {
+		console.error('Failed to fetch API keys:', error);
+		// You could set `apiKeys` to an empty array or any value that indicates an error occurred
+		apiKeys = []; // Optional: Indicate error here (e.g., `null` or `[]`)
+	}
 
 	return (
 		<main>
-			<p>This is the dashboard. Only logged-in users can view this route</p>
-			<p>Logged-in user: </p>
-			<pre>{JSON.stringify(model, null, 2)}</pre>
-			<form action={logout}>
-				<button type="submit">logout</button>
-			</form>
+			{/* Render the ApiKeyDashboardClient regardless of the fetch success */}
+			<ApiKeyDashboardClient initialApiKeys={apiKeys} user={model} token={token} />
 		</main>
 	);
 }
