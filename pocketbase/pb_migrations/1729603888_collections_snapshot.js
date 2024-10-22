@@ -4,7 +4,7 @@ migrate((db) => {
     {
       "id": "zu476qneva9zdcc",
       "created": "2024-10-18 14:04:52.893Z",
-      "updated": "2024-10-21 12:23:02.586Z",
+      "updated": "2024-10-22 12:56:51.781Z",
       "name": "example_content",
       "type": "base",
       "system": false,
@@ -20,20 +20,36 @@ migrate((db) => {
           "options": {
             "convertUrls": false
           }
+        },
+        {
+          "system": false,
+          "id": "zhqji8jt",
+          "name": "account",
+          "type": "relation",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "options": {
+            "collectionId": "_pb_users_auth_",
+            "cascadeDelete": false,
+            "minSelect": null,
+            "maxSelect": 1,
+            "displayFields": null
+          }
         }
       ],
       "indexes": [],
       "listRule": null,
-      "viewRule": null,
-      "createRule": null,
-      "updateRule": null,
-      "deleteRule": null,
+      "viewRule": "@request.auth.id != \"\" && @request.auth.id = account",
+      "createRule": "@request.auth.id != \"\" && @request.auth.id = @request.data.account",
+      "updateRule": "@request.auth.id != \"\" && @request.auth.id = account",
+      "deleteRule": "@request.auth.id != \"\" && @request.auth.id = account",
       "options": {}
     },
     {
       "id": "tshz16ybex79drf",
       "created": "2024-10-21 12:21:22.441Z",
-      "updated": "2024-10-21 12:23:48.287Z",
+      "updated": "2024-10-22 12:45:24.584Z",
       "name": "api_keys",
       "type": "base",
       "system": false,
@@ -97,16 +113,16 @@ migrate((db) => {
       ],
       "indexes": [],
       "listRule": null,
-      "viewRule": null,
-      "createRule": null,
-      "updateRule": null,
-      "deleteRule": null,
+      "viewRule": "@request.auth.id != \"\" && @request.auth.id = account",
+      "createRule": "@request.auth.id != \"\" && @request.auth.id = @request.data.account",
+      "updateRule": "@request.auth.id != \"\" && @request.auth.id = account",
+      "deleteRule": "@request.auth.id != \"\" && @request.auth.id = account",
       "options": {}
     },
     {
       "id": "_pb_users_auth_",
-      "created": "2024-10-21 12:23:02.559Z",
-      "updated": "2024-10-21 12:23:02.586Z",
+      "created": "2024-10-22 12:45:24.554Z",
+      "updated": "2024-10-22 12:45:24.577Z",
       "name": "users",
       "type": "auth",
       "system": false,
