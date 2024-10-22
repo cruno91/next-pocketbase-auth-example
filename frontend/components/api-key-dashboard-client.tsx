@@ -1,67 +1,71 @@
 'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Copy, Key, Loader2, MoreHorizontal, Trash } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Copy, Key, Loader2, MoreHorizontal, Trash } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 type ApiKey = {
-  id: string
-  name: string
-  key: string
-  createdAt: string
-}
+  id: string;
+  name: string;
+  key: string;
+  createdAt: string;
+};
 
 type User = {
-  id: string
-  email: string
+  id: string;
+  email: string;
   // Add other relevant fields from your auth model
-}
+};
 
 type ApiKeyDashboardClientProps = {
-  initialApiKeys: ApiKey[]
-  user: User
-  token: string
-}
+  initialApiKeys: ApiKey[];
+  user: User;
+  token: string;
+};
 
 export default function ApiKeyDashboardClient({ initialApiKeys, user, token }: ApiKeyDashboardClientProps) {
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>(initialApiKeys)
-  const [newKeyName, setNewKeyName] = useState("")
-  const [isCreatingKey, setIsCreatingKey] = useState(false)
-  const [keyToRevoke, setKeyToRevoke] = useState<ApiKey | null>(null)
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>(initialApiKeys);
+  const [newKeyName, setNewKeyName] = useState("");
+  const [isCreatingKey, setIsCreatingKey] = useState(false);
+  const [keyToRevoke, setKeyToRevoke] = useState<ApiKey | null>(null);
 
   const handleCreateKey = async () => {
-    setIsCreatingKey(true)
+    setIsCreatingKey(true);
+
+    // Generate a secure API key on the client side
+    const apiKey = crypto.randomUUID(); // Secure random key
+
     try {
       const response = await fetch('/api/api-keys', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`, // Send token for user identification
         },
-        body: JSON.stringify({ name: newKeyName })
-      })
+        body: JSON.stringify({ name: newKeyName, apiKey }), // Send both the key name and the raw key
+      });
+
       if (response.ok) {
-        const newKey = await response.json()
-        setApiKeys([...apiKeys, newKey])
-        setNewKeyName("")
+        const newKey = await response.json();
+        setApiKeys([...apiKeys, newKey]);
+        setNewKeyName("");
       } else {
-        throw new Error('Failed to create API key')
+        throw new Error('Failed to create API key');
       }
     } catch (error) {
-      console.error('Error creating API key:', error)
-      // Handle error (e.g., show error message to user)
+      console.error('Error creating API key:', error);
     } finally {
-      setIsCreatingKey(false)
+      setIsCreatingKey(false);
     }
-  }
+  };
 
   const handleCopyKey = (key: string) => {
-    navigator.clipboard.writeText(key)
-  }
+    navigator.clipboard.writeText(key);
+  };
 
   const handleRevokeKey = async () => {
     if (keyToRevoke) {
@@ -69,22 +73,21 @@ export default function ApiKeyDashboardClient({ initialApiKeys, user, token }: A
         const response = await fetch(`/api/api-keys/${keyToRevoke.id}`, {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
+            'Authorization': `Bearer ${token}`,
+          },
+        });
         if (response.ok) {
-          setApiKeys(apiKeys.filter(key => key.id !== keyToRevoke.id))
+          setApiKeys(apiKeys.filter((key) => key.id !== keyToRevoke.id));
         } else {
-          throw new Error('Failed to revoke API key')
+          throw new Error('Failed to revoke API key');
         }
       } catch (error) {
-        console.error('Error revoking API key:', error)
-        // Handle error (e.g., show error message to user)
+        console.error('Error revoking API key:', error);
       } finally {
-        setKeyToRevoke(null)
+        setKeyToRevoke(null);
       }
     }
-  }
+  };
 
   return (
     <div className="container mx-auto py-10">
@@ -162,5 +165,5 @@ export default function ApiKeyDashboardClient({ initialApiKeys, user, token }: A
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
