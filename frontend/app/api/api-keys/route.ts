@@ -55,3 +55,45 @@ export async function POST(req: Request) {
 		return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
 	}
 }
+
+export async function GET(req: Request) {
+	const authorization = req.headers.get('authorization');
+
+	// Check if the authorization header is present
+	if (!authorization) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	// Extract the token from the authorization header
+	const token = authorization.split(' ')[1];
+
+	if (!token) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	try {
+		// Set the auth token manually in PocketBase
+		pb.authStore.save(token, null);
+
+		// Try refreshing the authentication session with the current token
+		const authData = await pb.collection('users').authRefresh();
+
+		const user = pb.authStore.model;
+		if (!user) {
+			console.log('AuthData:', authData);
+			throw new Error('Invalid token');
+		}
+
+		// Fetch all API keys associated with the authenticated user
+		const apiKeys = await pb.collection('api_keys').getFullList({
+			filter: `account = "${user.id}" && (revoked != true)`, // Fetch only non-revoked keys for the authenticated user
+			fields: 'id, name, key, created, last_used'
+		});
+
+		// Return the user's API keys
+		return NextResponse.json(apiKeys);
+	} catch (error) {
+		console.error('Error fetching API keys:', error);
+		return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+	}
+}

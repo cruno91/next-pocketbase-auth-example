@@ -8,7 +8,8 @@ import Link from 'next/link';
 
 async function getApiKeys(token: string) {
 	// Replace with your actual API endpoint
-	const response = await fetch('https://your-api-endpoint.com/api/api-keys', {
+	const response = await fetch(process.env.NEXT_PUBLIC_BASE_URL+'/api/api-keys', {
+		method: 'GET',
 		headers: {
 			'Authorization': `Bearer ${token}`,
 		},

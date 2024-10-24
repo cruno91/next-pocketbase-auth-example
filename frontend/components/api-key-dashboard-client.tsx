@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -33,6 +33,12 @@ export default function ApiKeyDashboardClient({ initialApiKeys, user, token }: A
   const [newKeyName, setNewKeyName] = useState("");
   const [isCreatingKey, setIsCreatingKey] = useState(false);
   const [keyToRevoke, setKeyToRevoke] = useState<ApiKey | null>(null);
+  const [clientRendered, setClientRendered] = useState(false);
+
+  useEffect(() => {
+    // This ensures the component is rendered fully on the client
+    setClientRendered(true);
+  }, []);
 
   const handleCreateKey = async () => {
     setIsCreatingKey(true);
@@ -52,7 +58,10 @@ export default function ApiKeyDashboardClient({ initialApiKeys, user, token }: A
 
       if (response.ok) {
         const newKey = await response.json();
-        setApiKeys([...apiKeys, newKey]);
+
+        // Ensure a new array is created for the updated state
+        setApiKeys((prevKeys) => [...prevKeys, newKey]);
+
         setNewKeyName("");
       } else {
         throw new Error('Failed to create API key');
@@ -115,6 +124,7 @@ export default function ApiKeyDashboardClient({ initialApiKeys, user, token }: A
               <TableHead>Name</TableHead>
               <TableHead>API Key</TableHead>
               <TableHead>Created</TableHead>
+              <TableHead>Last used</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -123,9 +133,18 @@ export default function ApiKeyDashboardClient({ initialApiKeys, user, token }: A
               <TableRow key={apiKey.id}>
                 <TableCell>{apiKey.name}</TableCell>
                 <TableCell>
-                  <code className="bg-muted px-2 py-1 rounded">{apiKey.key.slice(0, 8)}...{apiKey.key.slice(-4)}</code>
+                  <code className="bg-muted px-2 py-1 rounded">
+                    {apiKey.key.slice(0, 8)}...{apiKey.key.slice(-4)}
+                  </code>
                 </TableCell>
-                <TableCell>{apiKey.createdAt}</TableCell>
+                {/* Conditionally render dates after client is mounted */}
+                <TableCell>
+                  {clientRendered ? new Date(apiKey.created).toLocaleString() : '...'}
+                </TableCell>
+                <TableCell>
+                  {clientRendered ? (apiKey.last_used ? new Date(apiKey.last_used).toLocaleString() : 'Never') : '...'}
+                </TableCell>
+
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
