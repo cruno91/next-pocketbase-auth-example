@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Copy, Key, Loader2, MoreHorizontal, Trash } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { generateApiKey } from "@/lib/api-keys"
 
 type ApiKey = {
   id: string;
@@ -37,7 +38,7 @@ export default function ApiKeyDashboardClient({ initialApiKeys, user, token }: A
     setIsCreatingKey(true);
 
     // Generate a secure API key on the client side
-    const apiKey = crypto.randomUUID(); // Secure random key
+    const apiKey = generateApiKey(); // Secure random key
 
     try {
       const response = await fetch('/api/api-keys', {
@@ -155,7 +156,7 @@ export default function ApiKeyDashboardClient({ initialApiKeys, user, token }: A
           <DialogHeader>
             <DialogTitle>Revoke API Key</DialogTitle>
             <DialogDescription>
-              Are you sure you want to revoke the API key "{keyToRevoke?.name}"? This action cannot be undone.
+              Are you sure you want to revoke the API key &#34;{keyToRevoke?.name}&#34;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

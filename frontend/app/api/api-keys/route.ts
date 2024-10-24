@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
+import { NextResponse } from 'next/server'
 import PocketBase from 'pocketbase';
+import { hashApiKey } from "@/lib/api-keys"
 
 const pb = new PocketBase(process.env.POCKETBASE_URL); // Replace with your Pocketbase URL
 
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 		}
 
 		// Hash the API key before storing it in PocketBase
-		const hashedApiKey = await bcrypt.hash(apiKey, 10);
+		const hashedApiKey = await hashApiKey(apiKey);
 
 		// Create a new API key record in the PocketBase 'api_keys' collection
 		const record = await pb.collection('api_keys').create({
