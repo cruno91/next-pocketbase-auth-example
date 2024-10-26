@@ -1,12 +1,12 @@
 'use client'
 
-import {useEffect, useState} from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";;
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, MoreHorizontal, Trash } from "lucide-react";
+import { Copy, Loader2, MoreHorizontal, Trash, Edit } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 type ContentEntry = {
@@ -27,7 +27,10 @@ export default function ContentDashboard({ initialContent, token }: ContentDashb
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [isCreatingContent, setIsCreatingContent] = useState(false);
+  const [contentToEdit, setContentToEdit] = useState<ContentEntry | null>(null);
   const [contentToDelete, setContentToDelete] = useState<ContentEntry | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
   const [clientRendered, setClientRendered] = useState(false);
 
   useEffect(() => {
@@ -62,11 +65,38 @@ export default function ContentDashboard({ initialContent, token }: ContentDashb
     }
   };
 
+  const handleUpdateContent = async () => {
+    if (!contentToEdit) return;
+
+    try {
+      const response = await fetch('/api/content', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id: contentToEdit.id, title: editTitle, description: editDescription }),
+      });
+
+      if (response.ok) {
+        const updatedContent = await response.json();
+        setContentEntries((prevEntries) =>
+          prevEntries.map((entry) => (entry.id === updatedContent.id ? updatedContent : entry))
+        );
+        setContentToEdit(null);
+      } else {
+        throw new Error('Failed to update content');
+      }
+    } catch (error) {
+      console.error('Error updating content:', error);
+    }
+  };
+
   const handleDeleteContent = async () => {
     if (!contentToDelete) return;
 
     try {
-      const response = await fetch(`/api/example-content?id=${contentToDelete.id}`, {
+      const response = await fetch(`/api/content?id=${contentToDelete.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -75,13 +105,12 @@ export default function ContentDashboard({ initialContent, token }: ContentDashb
 
       if (response.ok) {
         setContentEntries(contentEntries.filter((entry) => entry.id !== contentToDelete.id));
+        setContentToDelete(null);
       } else {
         throw new Error('Failed to delete content');
       }
     } catch (error) {
       console.error('Error deleting content:', error);
-    } finally {
-      setContentToDelete(null);
     }
   };
 
@@ -114,7 +143,7 @@ export default function ContentDashboard({ initialContent, token }: ContentDashb
               <TableRow key={entry.id}>
                 <TableCell>{entry.title}</TableCell>
                 <TableCell>{entry.description}</TableCell>
-                <TableCell>{clientRendered ? (entry.created ? new Date(entry.created).toLocaleString() : '') : ' ...'}</TableCell>
+                <TableCell>{clientRendered ? (entry.created ? new Date(entry.created).toLocaleString() : 'recently') : '...'}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -123,6 +152,10 @@ export default function ContentDashboard({ initialContent, token }: ContentDashb
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => { setContentToEdit(entry); setEditTitle(entry.title); setEditDescription(entry.description); }}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setContentToDelete(entry)}>
                         <Trash className="mr-2 h-4 w-4" />
                         Delete
@@ -136,6 +169,25 @@ export default function ContentDashboard({ initialContent, token }: ContentDashb
         </Table>
       </div>
 
+      {/* Edit Content Dialog */}
+      <Dialog open={!!contentToEdit} onOpenChange={() => setContentToEdit(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Content</DialogTitle>
+            <DialogDescription>Modify the title and description for the selected content.</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-2">
+            <Input placeholder="Title" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
+            <Textarea placeholder="Description" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setContentToEdit(null)}>Cancel</Button>
+            <Button variant="default" onClick={handleUpdateContent}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
       <Dialog open={!!contentToDelete} onOpenChange={() => setContentToDelete(null)}>
         <DialogContent>
           <DialogHeader>

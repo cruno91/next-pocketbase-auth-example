@@ -57,6 +57,34 @@ export async function POST(req: Request) {
   }
 }
 
+export async function PUT(req: Request) {
+  const authorization = req.headers.get('authorization');
+  const { id, title, description } = await req.json();
+
+  if (!authorization || !id) {
+    return NextResponse.json({ error: 'Unauthorized or missing content ID' }, { status: 401 });
+  }
+
+  const token = authorization.split(' ')[1];
+
+  try {
+    pb.authStore.save(token, null);
+    await pb.collection('users').authRefresh();
+
+    const user = pb.authStore.model;
+    const content = await pb.collection('example_content').getOne(id);
+
+    if (content.account !== user.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    const updatedContent = await pb.collection('example_content').update(id, { title, description });
+    return NextResponse.json(updatedContent);
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to update content' }, { status: 500 });
+  }
+}
+
 export async function DELETE(req: Request) {
   const authorization = req.headers.get('authorization');
   const url = new URL(req.url);
