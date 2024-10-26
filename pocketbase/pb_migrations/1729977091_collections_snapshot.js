@@ -4,23 +4,11 @@ migrate((db) => {
     {
       "id": "zu476qneva9zdcc",
       "created": "2024-10-18 14:04:52.893Z",
-      "updated": "2024-10-22 12:56:51.781Z",
+      "updated": "2024-10-26 21:11:10.786Z",
       "name": "example_content",
       "type": "base",
       "system": false,
       "schema": [
-        {
-          "system": false,
-          "id": "6qiklkde",
-          "name": "description",
-          "type": "editor",
-          "required": false,
-          "presentable": false,
-          "unique": false,
-          "options": {
-            "convertUrls": false
-          }
-        },
         {
           "system": false,
           "id": "zhqji8jt",
@@ -36,10 +24,36 @@ migrate((db) => {
             "maxSelect": 1,
             "displayFields": null
           }
+        },
+        {
+          "system": false,
+          "id": "mjdll77x",
+          "name": "title",
+          "type": "text",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "options": {
+            "min": null,
+            "max": null,
+            "pattern": ""
+          }
+        },
+        {
+          "system": false,
+          "id": "6qiklkde",
+          "name": "description",
+          "type": "editor",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "options": {
+            "convertUrls": false
+          }
         }
       ],
       "indexes": [],
-      "listRule": null,
+      "listRule": "@request.auth.id != \"\" && account = @request.auth.id",
       "viewRule": "@request.auth.id != \"\" && @request.auth.id = account",
       "createRule": "@request.auth.id != \"\" && @request.auth.id = @request.data.account",
       "updateRule": "@request.auth.id != \"\" && @request.auth.id = account",
