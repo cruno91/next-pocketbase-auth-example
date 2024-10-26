@@ -49,7 +49,7 @@ migrate((db) => {
     {
       "id": "tshz16ybex79drf",
       "created": "2024-10-21 12:21:22.441Z",
-      "updated": "2024-10-26 20:58:57.095Z",
+      "updated": "2024-10-26 21:01:42.462Z",
       "name": "api_keys",
       "type": "base",
       "system": false,
@@ -74,6 +74,20 @@ migrate((db) => {
           "system": false,
           "id": "jl93vh18",
           "name": "key",
+          "type": "text",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "options": {
+            "min": null,
+            "max": null,
+            "pattern": ""
+          }
+        },
+        {
+          "system": false,
+          "id": "g5gvvz60",
+          "name": "name",
           "type": "text",
           "required": false,
           "presentable": false,
