@@ -167,10 +167,6 @@ export default function ApiKeyDashboardClient({ initialApiKeys, token }: ApiKeyD
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => apiKey.key && handleCopyRawKey(apiKey.key)}>
-                        <Copy className="mr-2 h-4 w-4" />
-                        Copy
-                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setKeyToRevoke(apiKey)}>
                         <Trash className="mr-2 h-4 w-4" />
                         Revoke
