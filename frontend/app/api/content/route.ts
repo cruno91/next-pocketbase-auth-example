@@ -72,6 +72,7 @@ export async function PUT(req: Request) {
     await pb.collection('users').authRefresh();
 
     const user = pb.authStore.model;
+    if (!user) throw new Error('Invalid token');
     const content = await pb.collection('example_content').getOne(id);
 
     if (content.account !== user.id) {
