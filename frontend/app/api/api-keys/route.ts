@@ -61,6 +61,51 @@ export async function GET(req: Request) {
 
 	// Check if the authorization header is present
 	if (!authorization) {
+		console.log('No authorization header');
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	// Extract the token from the authorization header
+	const token = authorization.split(' ')[1];
+
+	if (!token) {
+		console.log('No token found in authorization header');
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	try {
+		// Set the auth token manually in PocketBase
+		pb.authStore.save(token, null);
+
+		// Try refreshing the authentication session with the current token
+		await pb.collection('users').authRefresh();
+
+		const user = pb.authStore.model;
+		if (!user) {
+			throw new Error('Invalid token');
+		}
+
+		// Fetch all API keys associated with the authenticated user, and exclude revoked keys
+		const apiKeys = await pb.collection('api_keys').getFullList({
+			filter: `account = "${user.id}" && (revoked != true)`,
+			fields: 'id, name, created, last_used',
+		});
+
+		// Return the user's API keys
+		return NextResponse.json(apiKeys);
+	} catch (error) {
+		console.error('Error fetching API keys:', error);
+		// Return an empty array if authorization fails, so the dashboard handles it gracefully
+		return NextResponse.json([], { status: 200 });
+	}
+}
+
+export async function DELETE(req: Request) {
+	const authorization = req.headers.get('authorization');
+	const url = new URL(req.url);
+	const apiKeyId = url.searchParams.get('id'); // Get the key ID from query params
+
+	if (!authorization) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
@@ -71,29 +116,35 @@ export async function GET(req: Request) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
+	if (!apiKeyId) {
+		return NextResponse.json({ error: 'API key ID is required' }, { status: 400 });
+	}
+
 	try {
 		// Set the auth token manually in PocketBase
 		pb.authStore.save(token, null);
 
 		// Try refreshing the authentication session with the current token
-		const authData = await pb.collection('users').authRefresh();
+		await pb.collection('users').authRefresh();
 
 		const user = pb.authStore.model;
 		if (!user) {
-			console.log('AuthData:', authData);
 			throw new Error('Invalid token');
 		}
 
-		// Fetch all API keys associated with the authenticated user
-		const apiKeys = await pb.collection('api_keys').getFullList({
-			filter: `account = "${user.id}" && (revoked != true)`, // Fetch only non-revoked keys for the authenticated user
-			fields: 'id, name, key, created, last_used'
-		});
+		// Check if the key exists and belongs to the authenticated user
+		const apiKeyRecord = await pb.collection('api_keys').getOne(apiKeyId);
 
-		// Return the user's API keys
-		return NextResponse.json(apiKeys);
+		if (apiKeyRecord.account !== user.id) {
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+		}
+
+		// Delete or revoke the API key
+		await pb.collection('api_keys').delete(apiKeyId);
+
+		return NextResponse.json({ success: true });
 	} catch (error) {
-		console.error('Error fetching API keys:', error);
-		return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+		console.error('Error revoking API key:', error);
+		return NextResponse.json({ error: 'Failed to revoke API key' }, { status: 500 });
 	}
 }
