@@ -14,6 +14,7 @@ type ApiKey = {
   name: string;
   created: string;
   last_used: string;
+  key?: string;
 };
 
 type User = {
@@ -41,10 +42,9 @@ export default function ApiKeyDashboardClient({ initialApiKeys, token }: ApiKeyD
   }, []);
 
   const handleCreateKey = async () => {
-    // Generate a secure API key
     const generatedKey = generateApiKey();
     setRawApiKey(generatedKey);
-    setShowKeyModal(true); // Open modal to show the key
+    setShowKeyModal(true); // Show the API key modal
   };
 
   const handleConfirmKeySave = async () => {
@@ -58,15 +58,15 @@ export default function ApiKeyDashboardClient({ initialApiKeys, token }: ApiKeyD
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: newKeyName, apiKey: rawApiKey }), // Save the raw key to Pocketbase
+        body: JSON.stringify({ name: newKeyName, apiKey: rawApiKey }), // Save the key to Pocketbase
       });
 
       if (response.ok) {
         const newKey = await response.json();
         setApiKeys((prevKeys) => [...prevKeys, newKey]);
         setNewKeyName("");
-        setRawApiKey(null); // Clear raw key
-        setShowKeyModal(false); // Close modal
+        setRawApiKey(null);
+        setShowKeyModal(false);
       } else {
         throw new Error('Failed to create API key');
       }
@@ -77,31 +77,29 @@ export default function ApiKeyDashboardClient({ initialApiKeys, token }: ApiKeyD
     }
   };
 
-  const handleCopyRawKey = () => {
-    if (rawApiKey) {
-      navigator.clipboard.writeText(rawApiKey);
-    }
+  const handleCopyRawKey = (key: string) => {
+    navigator.clipboard.writeText(key);
   };
 
   const handleRevokeKey = async () => {
-    if (keyToRevoke) {
-      try {
-        const response = await fetch(`/api/api-keys/${keyToRevoke.id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        if (response.ok) {
-          setApiKeys(apiKeys.filter((key) => key.id !== keyToRevoke.id));
-        } else {
-          throw new Error('Failed to revoke API key');
-        }
-      } catch (error) {
-        console.error('Error revoking API key:', error);
-      } finally {
+    if (!keyToRevoke) return;
+
+    try {
+      const response = await fetch(`/api/api-keys?id=${keyToRevoke.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        setApiKeys((prevKeys) => prevKeys.filter((key) => key.id !== keyToRevoke.id));
         setKeyToRevoke(null);
+      } else {
+        throw new Error('Failed to revoke API key');
       }
+    } catch (error) {
+      console.error('Error revoking API key:', error);
     }
   };
 
@@ -134,10 +132,10 @@ export default function ApiKeyDashboardClient({ initialApiKeys, token }: ApiKeyD
             <code className="break-words text-lg">{rawApiKey}</code>
           </div>
           <DialogFooter>
-            <Button variant="secondary" onClick={handleCopyRawKey}>
+            <Button variant="secondary" onClick={() => rawApiKey && handleCopyRawKey(rawApiKey)}>
               <Copy className="mr-2 h-4 w-4" /> Copy Key
             </Button>
-            <Button variant="primary" onClick={handleConfirmKeySave} disabled={isCreatingKey}>
+            <Button variant="default" onClick={handleConfirmKeySave} disabled={isCreatingKey}>
               Confirm and Save Key
             </Button>
           </DialogFooter>
@@ -169,7 +167,7 @@ export default function ApiKeyDashboardClient({ initialApiKeys, token }: ApiKeyD
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleCopyRawKey(apiKey.key)}>
+                      <DropdownMenuItem onClick={() => apiKey.key && handleCopyRawKey(apiKey.key)}>
                         <Copy className="mr-2 h-4 w-4" />
                         Copy
                       </DropdownMenuItem>
@@ -191,7 +189,7 @@ export default function ApiKeyDashboardClient({ initialApiKeys, token }: ApiKeyD
           <DialogHeader>
             <DialogTitle>Revoke API Key</DialogTitle>
             <DialogDescription>
-              Are you sure you want to revoke the API key "{keyToRevoke?.name}"? This action cannot be undone.
+              Are you sure you want to revoke the API key &#34;{keyToRevoke?.name}&#34;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
