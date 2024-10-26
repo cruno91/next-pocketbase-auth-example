@@ -95,7 +95,7 @@ export async function GET(req: Request) {
 		return NextResponse.json(apiKeys);
 	} catch (error) {
 		console.error('Error fetching API keys:', error);
-		// Return an empty array if authorization fails, so the dashboard handles it gracefully
+		// Return an empty array if authorization fails, so the api-keys handles it gracefully
 		return NextResponse.json([], { status: 200 });
 	}
 }

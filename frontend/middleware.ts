@@ -3,7 +3,7 @@ import { isTokenExpired } from 'pocketbase';
 
 export function middleware(request: NextRequest) {
 	// Protected routes that require authentication
-	const protectedRoutes = ['/dashboard', '/admin', '/user'];
+	const protectedRoutes = ['/api-keys', '/admin', '/user'];
 
 	if (protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
 		const authCookie = request.cookies.get('pb_auth');
@@ -51,5 +51,5 @@ function redirectToLogin(request: NextRequest) {
 
 // You can keep the config.matcher if you prefer, or remove it if you want to use the in-function checks
 // export const config = {
-//   matcher: ['/dashboard/:path*', '/admin/:path*', '/user/:path*'],
+//   matcher: ['/api-keys/:path*', '/admin/:path*', '/user/:path*'],
 // };
