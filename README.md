@@ -22,7 +22,10 @@ Login credentials to the Pocketbase admin are in `.lando.env`.
 2. Register an account
 3. Go to https://authexample.lndo.site/login
 4. Login with the created account
-5. You will be redirected to `/dashboard`
+5. You will be redirected to `/api-keys`
+6. You can add and delete api keys
+7. You can navigate to `/content`
+8. You can add, edit, and delete content here
 
 ## Developer info
 
