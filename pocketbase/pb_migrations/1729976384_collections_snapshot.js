@@ -49,7 +49,7 @@ migrate((db) => {
     {
       "id": "tshz16ybex79drf",
       "created": "2024-10-21 12:21:22.441Z",
-      "updated": "2024-10-22 12:45:24.584Z",
+      "updated": "2024-10-26 20:58:57.095Z",
       "name": "api_keys",
       "type": "base",
       "system": false,
@@ -112,7 +112,7 @@ migrate((db) => {
         }
       ],
       "indexes": [],
-      "listRule": null,
+      "listRule": "@request.auth.id != \"\" && account = @request.auth.id",
       "viewRule": "@request.auth.id != \"\" && @request.auth.id = account",
       "createRule": "@request.auth.id != \"\" && @request.auth.id = @request.data.account",
       "updateRule": "@request.auth.id != \"\" && @request.auth.id = account",
@@ -121,8 +121,8 @@ migrate((db) => {
     },
     {
       "id": "_pb_users_auth_",
-      "created": "2024-10-22 12:45:24.554Z",
-      "updated": "2024-10-22 12:45:24.577Z",
+      "created": "2024-10-26 20:44:35.255Z",
+      "updated": "2024-10-26 20:44:35.296Z",
       "name": "users",
       "type": "auth",
       "system": false,
