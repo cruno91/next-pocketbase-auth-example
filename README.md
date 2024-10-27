@@ -1,4 +1,10 @@
-# Next.js 14 + Pocketbase Authentication Example
+# Full Stack Content API Example
+
+An example repository containing a Pocketbase instance to store API keys and
+basic content associated with a user account, a Next.js application to register
+and login to accounts, create content, and generate API keys, and a custom API
+server built in Golang with gin and cobra to fetch and query for user content
+with the generated API keys.
 
 ## Setup
 
