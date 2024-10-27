@@ -44,6 +44,8 @@ services:
   api:
     type: go
     port: 8090
+    ssl: true
+    sslExpose: true
     scanner:
       okCodes:
         - 400
@@ -57,6 +59,7 @@ services:
         - ECONNRESET
     build_as_root:
       - apt-get update -y && apt-get install -y --no-install-recommends apt-utils unzip
+      #- cd server && openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
 events:
   post-start:
     - pocketbase: cd /app/pocketbase && ./pocketbase serve --http=0.0.0.0:8090 &
