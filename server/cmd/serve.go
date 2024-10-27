@@ -25,7 +25,7 @@ func init() {
 	rootCmd.AddCommand(serveCmd)
 
 	// Add flags for server configuration
-	serveCmd.Flags().StringVarP(&port, "port", "p", "8090", "Port to run the HTTP server on")
+	serveCmd.Flags().StringVarP(&port, "port", "p", "8080", "Port to run the HTTP server on")
 }
 
 // startServer initializes and runs the HTTP server

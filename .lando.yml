@@ -43,7 +43,7 @@ services:
       - cd /app/pocketbase && ./pocketbase admin create admin@example.com In5ecureP4S123
   api:
     type: go
-    port: 8090
+    port: 8080
     ssl: true
     sslExpose: true
     scanner:
@@ -69,7 +69,7 @@ proxy:
   pocketbase:
     - db.authexample.lndo.site:8090
   api:
-    - api.authexample.lndo.site
+    - api.authexample.lndo.site:8080
 tooling:
   pb:
     service: pocketbase
