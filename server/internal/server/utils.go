@@ -9,40 +9,47 @@ import (
 	"os"
 )
 
-// Validate API key by checking it against stored keys in PocketBase
-func isValidAPIKey(apiKey string) bool {
-	accountID, err := getAccountIDFromAPIKey(apiKey)
-	return err == nil && accountID != ""
-}
-
-// Get account ID associated with the API key
-func getAccountIDFromAPIKey(apiKey string) (string, error) {
+// GetAccountIDFromAPIKey checks if an API key exists in PocketBase and returns the associated account ID.
+func GetAccountIDFromAPIKey(apiKey string) (string, error) {
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", os.Getenv("POCKETBASE_URL")+"/api/collections/api_keys/records", nil)
+	adminToken, err := GetAdminToken() // Retrieve valid token
 	if err != nil {
 		return "", err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+apiKey)
+	url := fmt.Sprintf("%s/api/collections/api_keys/records?filter=key='%s'", os.Getenv("POCKETBASE_URL"), apiKey)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Authorization", "Admin "+adminToken)
 
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("failed to validate API key")
+		return "", fmt.Errorf("failed to validate API key with PocketBase")
 	}
 	defer resp.Body.Close()
 
 	// Parse JSON response to extract account ID
 	var result struct {
-		Account string `json:"account"`
+		Items []struct {
+			Account string `json:"account"`
+		} `json:"items"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return "", err
 	}
-	return result.Account, nil
+
+	if len(result.Items) == 0 {
+		return "", fmt.Errorf("API key not found")
+	}
+
+	return result.Items[0].Account, nil
 }
 
 // Fetch example content associated with a specific account ID
-func fetchContentForAccount(accountID string) ([]map[string]interface{}, error) {
+func FetchContentForAccount(accountID string) ([]map[string]interface{}, error) {
 	client := &http.Client{}
 	url := fmt.Sprintf("%s/api/collections/example_content/records?filter=account='%s'", os.Getenv("POCKETBASE_URL"), accountID)
 	req, err := http.NewRequest("GET", url, nil)

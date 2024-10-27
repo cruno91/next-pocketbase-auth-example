@@ -3,6 +3,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -16,8 +17,9 @@ func GetContentHandler(c *gin.Context) {
 	}
 
 	// Fetch example content specific to the account ID
-	content, err := fetchContentForAccount(accountID.(string)) // Implemented in utils.go
+	content, err := FetchContentForAccount(accountID.(string)) // Implemented in utils.go
 	if err != nil {
+		fmt.Println("Failed to fetch content:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch content"})
 		return
 	}
