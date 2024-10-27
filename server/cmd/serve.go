@@ -1,4 +1,5 @@
 // cmd/serve.go
+
 package cmd
 
 import (
@@ -6,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 	"log"
+	"next-auth-example/internal/server"
 )
 
 var port string
@@ -41,6 +43,9 @@ func startServer() {
 			"message": "Server is healthy",
 		})
 	})
+
+	// Content route with API key validation middleware
+	router.GET("/api/content", server.ValidateAPIKey, server.GetContentHandler)
 
 	// Start the server
 	if err := router.Run(addr); err != nil {
