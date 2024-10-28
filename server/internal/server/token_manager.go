@@ -16,7 +16,17 @@ var tokenMutex sync.Mutex
 
 // authenticateAdmin authenticates with PocketBase to retrieve a new admin token.
 func authenticateAdmin() (string, error) {
-	url := viper.GetString("pocketbase.url")
+	baseURL := viper.GetString("pocketbase.url")
+	if baseURL == "" {
+		return "", fmt.Errorf("pocketbase.url is not set")
+	}
+
+	// Ensure we don’t accidentally double up on slashes in the URL
+	if baseURL[len(baseURL)-1:] == "/" {
+		baseURL = baseURL[:len(baseURL)-1]
+	}
+
+	url := fmt.Sprintf("%s/api/admins/auth-with-password", baseURL)
 	email := viper.GetString("pocketbase.email")
 	password := viper.GetString("pocketbase.password")
 
