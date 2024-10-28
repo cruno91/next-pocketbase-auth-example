@@ -5,8 +5,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/spf13/viper"
 	"net/http"
-	"os"
 	"sync"
 	"time"
 )
@@ -16,9 +16,9 @@ var tokenMutex sync.Mutex
 
 // authenticateAdmin authenticates with PocketBase to retrieve a new admin token.
 func authenticateAdmin() (string, error) {
-	url := os.Getenv("POCKETBASE_URL") + "/api/admins/auth-with-password"
-	email := os.Getenv("POCKETBASE_ADMIN")
-	password := os.Getenv("POCKETBASE_ADMIN_PASSWORD")
+	url := viper.GetString("pocketbase.url")
+	email := viper.GetString("pocketbase.email")
+	password := viper.GetString("pocketbase.password")
 
 	// Prepare JSON payload
 	payload := map[string]string{
