@@ -17,7 +17,7 @@ export default function Login() {
 		const result = await login(formData);
 
 		if (result.success) {
-			router.push('/dashboard');
+			router.push('/content');
 		} else {
 			setError(result.error ?? 'An unexpected error occurred.');
 		}
