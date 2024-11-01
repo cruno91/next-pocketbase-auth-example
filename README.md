@@ -58,6 +58,18 @@ authenticated portion of the pages and client components with calls to Next.js
 API routes for rendering the dashboards and making the CRUD requests to
 Pocketbase.
 
+#### Tooling
+
+Development commands for Next.js can be ran via the `npm` and `npx` tooling:
+
+Examples:
+
+- Add a shadcn component `lando npx shadcn@latest add <component>`
+- Install defined dependencies `lando npm install`
+- Run the development version of the Next.js server `lando npm run dev`
+
+To run the production version of the Next.js server you can run `lando next`.
+
 ### API server (Golang with gin)
 
 The API server runs on gin and is built with Cobra and Viper libraries to store
@@ -79,7 +91,16 @@ request headers using bcrypt, and once verified as a match to a key on the
 account, will allow for fetching and returning a JSON response of the user's
 content.
 
-## Pocketbase (database)
+#### Tooling
+
+The `go` command is passed to the API service, so you can run any Go commands
+to update the package dependencies or extend the `cmd` package of the server.
+
+Example: `lando go version`
+
+The API server can be started with the custom tooling `lando api`. 
+
+### Pocketbase (database)
 
 You can login to Pocketbase to check logs and collection information with the
 credentials stored in `.lando.env` and by navigating to:
@@ -87,6 +108,15 @@ https://db.authexample.lndo.site
 
 API rules are set on the example_content and api_keys collections to prevent
 users from accessing other users' data.
+
+#### Tooling
+
+You can run `lando pb <pocketbase commands>` to pass 
+[Pocketbase](https://pocketbase.io/docs/) CLI commands to the Pocketbase service.
+
+Example: `lando pb --help`
+
+The Pocketbase server itself runs automatically on `lando start`.
 
 --- 
 
