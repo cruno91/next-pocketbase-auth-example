@@ -15,10 +15,8 @@ with the generated API keys.
 ### Local environment
 
 1. Run `lando start`
-2. Run `lando api-config` to add the default credentials to the api Lando 
-service
-3. Run `lando next` to start the frontend
-4. In another terminal, run `lando api` to start the API server
+2. Run `lando next` to start the frontend
+3. In another terminal, run `lando api` to start the API server
 
 ## Authentication flow
 
@@ -44,12 +42,6 @@ Example:
 curl -X GET "http://api.authexample.lndo.site/api/content?email=example1@example.com" \
   -H "Authorization: Bearer 79d4805877d7f8b3c9410a51cb8a26845103eca7d0dd00bf7f6a18bbbcd82d44"
 ```
-
-## Pocketbase
-
-You can login to Pocketbase to check logs and collection information with the
-credentials stored in `.lando.env` and by navigating to: 
-https://db.authexample.lndo.site
 
 ## Developer info
 
@@ -87,5 +79,16 @@ request headers using bcrypt, and once verified as a match to a key on the
 account, will allow for fetching and returning a JSON response of the user's
 content.
 
-Originally researched via 
+## Pocketbase (database)
+
+You can login to Pocketbase to check logs and collection information with the
+credentials stored in `.lando.env` and by navigating to:
+https://db.authexample.lndo.site
+
+API rules are set on the example_content and api_keys collections to prevent
+users from accessing other users' data.
+
+--- 
+
+Originally researched Pocketbase + Next.js authentication here: 
 https://github.com/heloineto/nextjs-13-pocketbase-auth-example

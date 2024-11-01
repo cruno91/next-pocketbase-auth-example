@@ -60,6 +60,8 @@ services:
     build_as_root:
       - apt-get update -y && apt-get install -y --no-install-recommends apt-utils unzip
       - cd /app/server && ./update-go.sh
+    build:
+      - cd /app/server && go run main.go config
       #- cd server && openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
 events:
   post-start:
