@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
+	"io"
 	"net/http"
 )
 
@@ -18,11 +19,13 @@ type ContentItem struct {
 	Updated     string `json:"updated"`
 }
 
+// VerifyApiKey compares bcrypt hashed value with raw value
 func VerifyApiKey(rawApiKey string, hashedApiKey string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedApiKey), []byte(rawApiKey))
 	return err == nil
 }
 
+// GetUserFromEmail gets an account ID from a given email
 func GetUserFromEmail(email string) (string, error) {
 	client := &http.Client{}
 	adminToken, err := GetAdminToken() // Retrieve valid token
@@ -42,9 +45,13 @@ func GetUserFromEmail(email string) (string, error) {
 	if err != nil || resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("failed to get account from email with PocketBase")
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Printf("failed to close response body: %v", err)
+		}
+	}(resp.Body)
 
-	// Parse JSON response to extract account ID
 	var result struct {
 		Items []struct {
 			Account string `json:"id"`
@@ -55,7 +62,7 @@ func GetUserFromEmail(email string) (string, error) {
 	}
 
 	if len(result.Items) == 0 {
-		return "", fmt.Errorf("User not found")
+		return "", fmt.Errorf("user not found")
 	}
 
 	return result.Items[0].Account, nil
@@ -83,7 +90,12 @@ func GetAccountIDFromAPIKey(apiKey string, email string) (string, error) {
 	if err != nil || resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("failed to query PocketBase for API keys for user")
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Printf("failed to close response body: %v", err)
+		}
+	}(resp.Body)
 
 	// Parse JSON response to extract account ID
 	var result struct {
@@ -108,7 +120,7 @@ func GetAccountIDFromAPIKey(apiKey string, email string) (string, error) {
 	return "", fmt.Errorf("API key did not match keys for given account")
 }
 
-// Fetch example content associated with a specific account ID
+// FetchContentForAccount gets example content associated with a specific account ID
 func FetchContentForAccount(accountID string) ([]ContentItem, error) {
 	client := &http.Client{}
 	adminToken, err := GetAdminToken() // Retrieve valid token
@@ -128,7 +140,12 @@ func FetchContentForAccount(accountID string) ([]ContentItem, error) {
 	if err != nil || resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("failed to fetch content")
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Printf("failed to close response body: %v", err)
+		}
+	}(resp.Body)
 
 	var result struct {
 		Items []ContentItem `json:"items"`

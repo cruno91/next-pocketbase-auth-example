@@ -1,4 +1,4 @@
-// token_manager.go
+// Package server token_manager.go
 package server
 
 import (
@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/spf13/viper"
+	"io"
 	"net/http"
 	"sync"
 	"time"
@@ -30,7 +31,6 @@ func authenticateAdmin() (string, error) {
 	email := viper.GetString("pocketbase.email")
 	password := viper.GetString("pocketbase.password")
 
-	// Prepare JSON payload
 	payload := map[string]string{
 		"identity": email,
 		"password": password,
@@ -48,13 +48,17 @@ func authenticateAdmin() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to authenticate admin: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Printf("failed to close response body: %v", err)
+		}
+	}(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("authentication failed with status %d", resp.StatusCode)
 	}
 
-	// Parse token from response
 	var result struct {
 		Token string `json:"token"`
 	}
@@ -76,7 +80,8 @@ func GetAdminToken() (string, error) {
 			return "", err
 		}
 		adminToken = newToken
-		go refreshTokenOnExpiry() // Schedule refresh for when the token expires
+		// Schedule refresh for when the token expires.
+		go refreshTokenOnExpiry()
 	}
 	return adminToken, nil
 }
@@ -84,7 +89,7 @@ func GetAdminToken() (string, error) {
 // refreshTokenOnExpiry refreshes the token before it expires.
 func refreshTokenOnExpiry() {
 	// This should be replaced by an actual check for token validity.
-	time.Sleep(24 * time.Hour) // Adjust based on PocketBase token lifetime.
+	time.Sleep(24 * time.Hour)
 
 	tokenMutex.Lock()
 	defer tokenMutex.Unlock()
