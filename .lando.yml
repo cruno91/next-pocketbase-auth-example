@@ -63,6 +63,7 @@ services:
 events:
   post-start:
     - pocketbase: cd /app/pocketbase && ./pocketbase serve --http=0.0.0.0:8090 &
+    - next: cd /app/frontend && npm run build && npm run start
 proxy:
   next:
     - authexample.lndo.site:3000
