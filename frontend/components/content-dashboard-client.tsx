@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";;
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Copy, Loader2, MoreHorizontal, Trash, Edit } from "lucide-react";
+import { Loader2, MoreHorizontal, Trash, Edit } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 type ContentEntry = {

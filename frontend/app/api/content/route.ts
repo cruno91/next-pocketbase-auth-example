@@ -82,7 +82,7 @@ export async function PUT(req: Request) {
     const updatedContent = await pb.collection('example_content').update(id, { title, description });
     return NextResponse.json(updatedContent);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to update content' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to update content ' + error }, { status: 500 });
   }
 }
 
