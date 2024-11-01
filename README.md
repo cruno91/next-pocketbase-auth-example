@@ -26,7 +26,7 @@ with the generated API keys.
 4. Login with the created account
 5. You will be redirected to `/content`
 6. Create some content
-7. Go to https://authexample.lndo.site/api-keys`
+7. Go to https://authexample.lndo.site/api-keys
 8. Generate an API key
 9. Make a `curl` request with the email you used to register and the API key
 you generated like this:
