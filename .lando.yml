@@ -90,9 +90,9 @@ tooling:
     service: next
     cmd: npm run build && npm run start
     dir: /app/frontend
-  api-config:
+  go:
     service: api
-    cmd: go run main.go config
+    cmd: go
     dir: /app/server
   api:
     service: api
