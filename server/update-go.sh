@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 version=$(go version 2>/dev/null || echo "none")
-release=$(wget -qO- "https://golang.org/VERSION?m=text" | awk '/^go/{print $0}')
-
+#release=$(wget -qO- "https://golang.org/VERSION?m=text" | awk '/^go/{print $0}')
+release="go1.23.2"
 if [[ $version == *"$release"* ]]; then
     echo "The local Go version ${release} is up-to-date."
     exit 0
