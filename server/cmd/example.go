@@ -80,8 +80,19 @@ var exampleCmd = &cobra.Command{
 
 		// Print API keys for demonstration
 		fmt.Println("API Keys:")
+		fmt.Println("API Keys:")
 		for _, key := range apiKeys {
-			fmt.Println(key)
+			fmt.Println("-----------")
+			fmt.Printf("ID: %s\n", key["id"])
+			fmt.Printf("Name: %s\n", key["name"])
+			fmt.Printf("Account: %s\n", key["account"])
+			fmt.Printf("Collection ID: %s\n", key["collectionId"])
+			fmt.Printf("Collection Name: %s\n", key["collectionName"])
+			fmt.Printf("Key: %s\n", key["key"])
+			fmt.Printf("Created: %s\n", key["created"])
+			fmt.Printf("Last Used: %s\n", key["last_used"])
+			fmt.Printf("Revoked: %v\n", key["revoked"])
+			fmt.Printf("Updated: %s\n", key["updated"])
 		}
 	},
 }
@@ -97,7 +108,7 @@ func getAPIKeys(adminToken, baseURL string) ([]map[string]interface{}, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %v", err)
 	}
-	req.Header.Set("Authorization", "Admin "+adminToken)
+	req.Header.Set("Authorization", adminToken)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
