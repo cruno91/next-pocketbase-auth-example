@@ -59,11 +59,11 @@ services:
         - ECONNRESET
     build_as_root:
       - apt-get update -y && apt-get install -y --no-install-recommends apt-utils unzip
+      - cd /app/server && ./update-go.sh
       #- cd server && openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
 events:
   post-start:
     - pocketbase: cd /app/pocketbase && ./pocketbase serve --http=0.0.0.0:8090 &
-    - next: cd /app/frontend && npm run build && npm run start
 proxy:
   next:
     - authexample.lndo.site:3000
@@ -84,3 +84,11 @@ tooling:
     service: next
     cmd: npx
     dir: /app/frontend
+  next:
+    service: next
+    cmd: npm run build && npm run start
+    dir: /app/frontend
+  api:
+    service: api
+    cmd: go run main.go serve
+    dir: /app/server
