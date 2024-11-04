@@ -71,7 +71,10 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintf(os.Stderr, "Using config file: %s\n", viper.ConfigFileUsed())
+		_, err := fmt.Fprintf(os.Stderr, "Using config file: %s\n", viper.ConfigFileUsed())
+		if err != nil {
+			return
+		}
 	} else {
 		// Optionally, create the file if it doesn't exist yet
 		fmt.Println("No existing config file found. A new one will be created on save.")

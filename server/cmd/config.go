@@ -55,7 +55,16 @@ func init() {
 	configCmd.Flags().StringVarP(&PbEmail, "email", "e", "admin@example.com", "Pocketbase email")
 
 	// Bind Viper to each flag to allow loading them directly
-	viper.BindPFlag("pocketbase.url", configCmd.Flags().Lookup("url"))
-	viper.BindPFlag("pocketbase.password", configCmd.Flags().Lookup("password"))
-	viper.BindPFlag("pocketbase.email", configCmd.Flags().Lookup("email"))
+	err := viper.BindPFlag("pocketbase.url", configCmd.Flags().Lookup("url"))
+	if err != nil {
+		return
+	}
+	err = viper.BindPFlag("pocketbase.password", configCmd.Flags().Lookup("password"))
+	if err != nil {
+		return
+	}
+	err = viper.BindPFlag("pocketbase.email", configCmd.Flags().Lookup("email"))
+	if err != nil {
+		return
+	}
 }

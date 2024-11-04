@@ -10,9 +10,10 @@ export async function login(formData: FormData) {
 			typeof error === 'object' &&
 			error !== null &&
 			'status' in error &&
-			typeof (error as any).status === 'number'
+			typeof (error as { status: unknown }).status === 'number'
 		);
 	}
+
 
 	const email = formData.get('email') as string;
 	const password = formData.get('password') as string;
