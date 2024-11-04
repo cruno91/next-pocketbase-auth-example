@@ -43,6 +43,12 @@ export default function Home() {
             !
           </li>
           <li>
+            Visit <a href="/api-keys">the API keys dashboard </a> to generate keys for your account.
+          </li>
+          <li>
+            Visit <a href="/content">the content dashboard </a> to manage content for your account.
+          </li>
+          <li>
             Visit <a href="db.authexample.lndo.site/_/">the Pocketbase dashboard </a> to look around.
           </li>
         </ol>
